@@ -19,3 +19,19 @@ for($i=0; $i<$opilasteArv;$i++){
 foreach ($vso19 as $opilane){
     echo $opilane.'<br>';
 }
+$jaana = array(
+    'eesnimi' => 'Jaana',
+    'perenimi' => 'Šeffer'
+);
+echo '<pre>';
+print_r($jaana);
+echo '</pre>';
+foreach ($jaana as $element => $vaartus){
+    echo $element.'<br>';
+}
+foreach ($jaana as $element => $vaartus){
+    echo $vaartus.'<br>';
+}
+foreach ($jaana as $element => $vaartus){
+    echo $element.' - '.$vaartus.'<br>';
+}
