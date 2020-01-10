@@ -13,6 +13,6 @@ $vso19 = array(
 $opilasteArv = count($vso19);
 echo 'VSO19 rühmas on '.$opilasteArv.' õpilast<br>';
 echo 'Need on:<br>';
-for($i=0, $i<$opilasteArv;$i=i+1){
+for($i=0, $i<$opilasteArv;$i++){
     echo $vso19[$i].'<br>';
 }
