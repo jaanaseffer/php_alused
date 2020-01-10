@@ -35,3 +35,47 @@ foreach ($jaana as $element => $vaartus){
 foreach ($jaana as $element => $vaartus){
     echo $element.' - '.$vaartus.'<br>';
 }
+$opilased = array(
+    array(
+        'eesnimi' => 'Jaana',
+        'perenimi' => 'Šeffer'
+    ),
+    array(
+        'eesnimi' => 'Anne-Mari',
+        'perenimi' => 'Eensaar'
+    ),
+    array(
+        'eesnimi' => 'Rene',
+        'perenimi' => 'Kasetalu'
+    ),
+    array(
+        'eesnimi' => 'Hanna-Liisa',
+        'perenimi' => 'Vilms'
+    ),
+    array(
+        'eesnimi' => 'Erko',
+        'perenimi' => 'Sakkos'
+    ),
+    array(
+        'eesnimi' => 'Mairit',
+        'perenimi' => 'Saal'
+    ),
+    array(
+        'eesnimi' => 'Kerli',
+        'perenimi' => 'Tekku'
+    ),
+    array(
+        'eesnimi' => 'Andre',
+        'perenimi' => 'Eli'
+    ),
+    array(
+        'eesnimi' => 'Martin',
+        'perenimi' => 'Mõtsar'
+    ),
+);
+foreach ($opilased as $opilane){
+    foreach ($opilane as $element => $vaartus) {
+        echo $element.' -'.$vaartus.'<br>';
+    }
+    echo '<br>';
+}
