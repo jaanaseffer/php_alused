@@ -24,7 +24,7 @@ $jaana = array(
     'perenimi' => 'Šeffer'
 );
 echo '<pre>';
-print_r($jaana);
+print_r($opilased);
 echo '</pre>';
 foreach ($jaana as $element => $vaartus){
     echo $element.'<br>';
@@ -79,3 +79,4 @@ foreach ($opilased as $opilane){
     }
     echo '<br>';
 }
+echo $opilased[7]['perenimi'];
