@@ -314,3 +314,103 @@ Kõikide andmete kuvamiseks kasutame **foreach()** tsüklit kaks korda.
             echo "<br>";
         }
     ?>
+    
+# Ajafunktsioonid
+## Ajaloomine
+Aja loomisel kasutab PHP kokkulepitud UNIX stiilis ajatemplit (timestamp). Tegemist on sekunditega, mida loetakse alates 01.01.1970 ning selle väljakutsumiseks kasutatakse **time()** funktsiooni.
+
+    echo time(); //1361551056
+    
+## Kasutajasõbraliku kuupäeva kuvamine
+Kui vajutada hetkel veebilehitsejas Refresh, siis aeg muutub pidevalt. Selle kuupäevaga on probleem selles, et inimene ei saa aru, millise kuupäevaga on siis tegemist. Siinkohal tuleb mängu date() funktsioon, mis vajab kahte argumenti: kuupäevavorming ja ajatemplit.
+
+    echo date('d.m.Y G:i' , time());	//22.02.2013 16:02
+    
+Eelpool lisatud kuupäevavorming sisaldab järgmisi vormindamise sümboleid:
+
+- d – kuupäev 01-31
+- m – kuu numbrina 01-12
+- Y – neljakohaline aastaarv n: 2013
+- G – 24-tunnine tunniformaat 0-23
+- i –  minutid 0-59
+
+See, mis märkide vahele lisad on sinu valida. Antud kuupäevavormingu sümbolid on ära toodud aadressil: http://php.net/manual/en/function.date.php. Selle funktsiooniga on veel tore see, et kui ajatemplit mitte lisada, siis võtab see vaikimisi hetkekuupäeva ja kellaaja.
+
+    echo date('d.m.Y G:i');
+    
+## Ajavöönd
+Kui ma nüüd võrdlen serverist saadetud kellaaega oma arvuti kellaajaga, siis on see kaks tundi maas. Selle parandamiseks on võimalus koodi lisada soovitud ajavöönd.
+
+    date_default_timezone_set('Europe/Tallinn');	//22.02.2013 18:02
+    
+Teised ajavööndid leiad siit: http://www.php.net/manual/en/timezones.europe.php
+
+## Pika kuupäeva eestistamine
+PHP koodi loomisel ei ole vist piisavalt meie emakeelega arvestatud 🙂 ja sellepärast näiteks pika kuupäeva väljakutsumisel kuvatakse kuu nimetus võõrkeelsena.
+
+    echo date('d.F.Y');	//22.February.2013
+Selle parandamiseks peame looma eraldi massiivi, kus eestikeelse kuud algavad indeksiga 1. Pärast seda tegin päeva, kuu ja aasta jaoks eraldi muutujad, kusjuures kuu nimetuse saamiseks kasutan kuupäeva vormingut ‘n’. ‘n’ vormindab kuud 1-12, mis aitab massiivist leida üles õige kuu. Lõpuks väljastan kuu soovitud formaadis
+
+    <?php
+    //kuude massiiv
+    $eesti_kuud = array(1=>'jaanuar', 'veebruar', 'märts', 'aprill', 'mai', 'juuni', 'juuli', 'august', 'september', 'oktoober', 'november', 'detsember');
+    //kuupäevad massiividesse
+    $paev = date('d');
+    $kuu = $eesti_kuud[date('n')];
+    $aasta = date('Y');
+    //kuupäeva väljastamine
+    echo $paev.'.'.$kuu.' '.$aasta;	//22.veebruar2013
+    ?>
+    
+## Muu soovitud kuupäeva genereerimine
+Hetkel lasime PHP’l genereerida hetkekuupäeva, tundus päris lihtne? Aga mis saab siis kui soovin mõnda muud kuupäeva? Sellisel juhul tuleb kasutada **mktime()** funktsiooni.
+
+    mktime(tunnid, minutid, sekundid, kuu, päev, aasta, suveaeg)
+Antud funktsioon loob ajatempli ikka sekundites, seega tuleb see vormindada vastavalt. Soovime näiteks kuvada interneti sünnipäeva 29.10.1969.
+
+    $sp = mktime(0,0,0,10,29,1969);
+    echo date('d.m.Y', $sp);	//29.10.1969
+Funktsioonis oli selline tore parameeter nagu ‘suveaeg’. Lisades 1, lülitad suveaja sisse ja 0 välja. Kui sa seda ei lisa, siis jätad selle PHP’le otsustada.
+
+## Tehted kuupäevadega
+Üks võimalus ajaga arvutamiseks on **time()** ajatemplile lisada või eemaldada vastav arv sekundeid. Näiteks **time()+60** puhul lisatakse juurde 60sek ehk 1min jne. Loodan, et põhikooli matemaatika tuleb meelde 🙂
+
+    echo date('d.m.Y G:i' , time()+60);			//1min pärast
+    echo date('d.m.Y G:i' , time()+60*60);		//1h pärast
+    echo date('d.m.Y G:i' , time()+60*60*24);	//24h pärast
+Kui päevade, kuude ja aastateni jõuad, siis võib arvutamine natuke keerulisemaks osutada, seepärast võiks arvutusi teha mktime() funktsiooniga. Näiteks 27 aastat enne.
+
+ui päevade, kuude ja aastateni jõuad, siis võib arvutamine natuke keerulisemaks osutada, seepärast võiks arvutusi teha mktime() funktsiooniga. Näiteks 27 aastat enne.
+
+    $sp = mktime(0,0,0,10,29,1969-27);
+    echo date('d.m.Y', $sp);			//29.10.1942
+Kuupäevadega arvutamisel on võimalik kasutada ka inglise keelseid lauseid, näiteks järgmised:
+
+      echo strtotime("now");
+      echo strtotime("tomorrow");
+      echo strtotime("yesterday");
+      echo strtotime("10 September 2000");
+      echo strtotime("+1 day");
+      echo strtotime("+1 week");
+      echo strtotime("+2 week 3 days 4 hours 5 seconds");
+      echo strtotime("next Thursday");
+      echo strtotime("last Monday");
+      echo strtotime("5pm + 6 Hours");
+      echo strtotime("now + 4 fortnights");
+      echo strtotime("last Monday");
+      echo strtotime("4pm yesterday");
+      echo strtotime("6am 10 days ago");
+      
+Seletused leiad siit: http://www.php.net/manual/en/datetime.formats.relative.php
+
+## Kuupäeva valideerimine
+Nagu eelpool mainitud, on ajafunktsioone päris palju ja kõike ei jõua läbi vaadata. Viimase asjana tahaks siiski näidata funktsiooni, mis kontrollib, kas selline kuupäev eksisteerib. Kasuta seda näiteks kasutaja poolt sisestatud kuupäeva kontrollimiseks. Kui antud kuupäev on olemas, tuleb ‘Kuupäev korras!’ ja kui on mingi viga, nagu allpool, siis ‘Kuupäev on valesti sisestatud’.
+
+    if(checkdate(12,32,2013)) {
+        echo('Kuupäev korras!');
+    } else {
+        echo ('Kuupäev on valesti sisestatud');
+    }
+    
+    
+    
