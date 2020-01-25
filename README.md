@@ -716,3 +716,245 @@ Täiendan seda peatükki veelgi, sest tekkis idee kuidas seda saaks veel kontrol
     if(is_numeric($leht)){
        include('leht'.$leht.'.php');
     }
+    
+  
+# Töö tekstifailidega
+Kui me siiani oleme töötades andmed kenasti muutujasse kirjutanud ning nendega erinevalt manipuleerinud, siis pärast veebilehitseja kinnipanekut, andmed kaovad. Andmete salvestamiseks võiks need näiteks kirjutada mõnda tekstifaili. Selles peatükis vaatamegi, kuidas saada ligi tekstifailidele. Kui ühendus on saavutatud, siis lisame sinna soovitud teksti ja hiljem kuvame seda.  Peale seda uurime, millist infot saaksime faili kohta veel kuvada ja kas on võimalik seda faili ümbernimetada või vajadusel lause kustutada.
+
+Tekstifailis andmete hoidmist nimetatakse **lameandmebaasiks** (flat database), mis tähendab, et see sisaldab vaid ühte tabelit. Selle eeliseks on lihtsus, kuid suurte tabelite puhul jääb see aeglaseks ja ei paku samasuguseid võimalusi nagu SQL andmebaasid.
+
+## Tekstifailiga ühendamine ja ühenduse sulgemine
+Tekstifaili ühendamisel tuleb määrata, millise failiga tahad ühendust saada ning mida sa plaanid selle failiga pihta hakata (mode). See tähendab, et näiteks järgnevas koodis soovin faili kirjutama hakata – **‘w‘**. Failiga ühendamiseks kasutame funktsiooni **fopen()**.
+
+    //faili nimi 
+    $allikas = 'lipsum.txt'; 
+    //ava fail 
+    $minu_fail = fopen($allikas, 'w');
+
+Iga ühenduse loomisel on see alati viisakas ka sulgeda. Nii ka tekstifailiga ühendamise puhul – **fclose()**.
+
+    //faili nimi 
+    $allikas = 'lipsum.txt'; 
+    //ava fail 
+    $minu_fail = fopen($allikas, 'w'); 
+    //faili sulgemine 
+    fclose($minu_fail);
+    
+Kui avada fail kirjutamiseks, siis faili mitte eksisteerimisel see luuakse.
+ 
+**Faili avamise meetodid**
+
+ - **w** – write ehk avab faili kirjutamiseks, faili olemasolu pole oluline, kirjutamist alustatakse algusest
+- **r** – read ehk avab faili lugemiseks, fail peab juba olemas olema 
+ - **a** – append ehk uus tekst kirjutatakse faili lõppu
+
+Kõiki faili avamise meetodeid saab täiendada pluss märgiga: w+, r+, a+. See lubab faili üheaegselt nii kirjutada kui ka lugeda.
+
+## Tekstifaili kirjutamine
+Teksti lisamiseks kasutame **fwrite()** funktsiooni.
+
+    $allikas = 'lipsum.txt'; 
+    $minu_fail = fopen($allikas, 'w'); 
+    //lisatav tekst 
+    $tekst = "lorem ipsum"; 
+    //faili kirjutamine 
+    fwrite($minu_fail, $tekst); 
+    fclose($minu_fail);
+    
+Antud kirjutamise meetod kirjutab olemasoleva faili sisu üle!
+Kui on soovi lisada veel teksti, siis hetkel teen lihtsalt uue muutuja ja kirjutan selle faili.
+
+    $allikas = 'lipsum.txt';
+    $minu_fail = fopen($allikas, 'w');
+    //lisatav tekst
+    $tekst = "lorem ipsum";
+    $tekst2= "dolor sit amet";
+    //faili kirjutamine
+    fwrite($minu_fail, $tekst);
+    fwrite($minu_fail, $tekst2);
+    fclose($minu_fail);
+    
+Hetkel kirjutatakse kõik tekst ühe pika reana. Selleks, et iga tekst oleks uuel rea, kasuta reavahetust \n, kusjuures tekst peab olema topeltjutumärkide (“…”) vahel.
+
+    //lisatav tekst
+    $tekst = "lorem ipsum\n";
+    $tekst2= "dolor sit amet\n";
+    
+## Tekstifaili kirjutamise koodi lühem versioon
+Alates versioonist PHP5 on võimalik seda kõike (avada, kirjutada kui ka sulgeda) teha ühe funktsiooniga: **file_put_contents()**
+
+    $allikas = 'lipsum.txt';
+    $tekst = "Sed sed diam\n";
+    //avab-kirjutab-sulgeb
+    file_put_contents($allikas, $tekst);
+
+Nagu ikka, olemasolev tekstifaili sisu kirjutatakse üle. Selleks, et uus tekst lisataks faili lõppu, kasuta parameetrina **FILE_APPEND** (suured tähed)
+
+    $allikas = 'lipsum.txt';
+    $tekst = "Nunc non lorem\n";
+    //avab-kirjutab-sulgeb
+    file_put_contents($allikas, $tekst, FILE_APPEND);
+    
+## Faili kustutamine ja ümbernimetamine
+Failist lahtisaamiseks kasuta funktsiooni **unlink()** ja ümbernimetamiseks **rename()**
+
+    unlink('lipsum.txt');
+    
+Faili kustutamisel ja ümbernimetamisel on tingimus, et see peab olema eelnevalt suletud.
+
+    rename('vananimi.txt','uusnimi.txt');
+    
+## Tekstifaili lugemine
+Harjutamiseks tekitasin tekstifaili faili **loomad.txt**, mille sisu on järgmine.
+
+    Imetajad
+    Roomajad
+    Ämblikud
+    Kalad
+    Kahepaiksed
+
+Tekstifaili lugemiseks kasutame faili avamisel meetodit ‘**r**‘ ning selle lugemiseks kasutame alguses **fread()** funktsiooni. Faili lugemisel, tuleb määrata, mitu baiti tahame kuvada.
+
+    //faili nimi
+    $allikas = 'loomad.txt';
+    //faili avamine
+    $minu_fail = fopen($allikas, 'r');
+    //faili sisu kuvamine
+    $faili_sisu = fread($minu_fail, 30);
+    echo $faili_sisu;
+    //faili sulgemine
+    fclose($minu_fail);
+    
+Hetkel palusime kuvada 30baiti teksti. Me võime küll teada, et suur täht võtab 4baiti, väike 1bait jne. Pikema teksti puhul võib meil juba arvutamisega probleeme tulla. Sellepärast laseme koodil otsustada, kui suur fail on ja seda **filesize()** funktsiooniga.
+
+    //faili nimi
+    $allikas = 'loomad.txt';
+    //faili avamine
+    $minu_fail = fopen($allikas, 'r');
+    //faili sisu kuvamine
+    $faili_sisu = fread($minu_fail, filesize($allikas));
+    echo $faili_sisu;
+    //faili sulgemine
+    fclose($minu_fail);
+
+Nüüd peaksid saama väljundina kõik tekstiread. Probleem tekib reavahetustega, kus programm kuvab neid kui tühikuid.
+
+    Imetajad Roomajad Ämblikud Kalad Kahepaiksed
+
+Selleks, et html suudaks reavahetusest \n aru saada, tuleb see teisendada <br> siltideks **nl2br()** abil.
+
+    //faili nimi
+    $allikas = 'loomad.txt';
+    //faili avamine
+    $minu_fail = fopen($allikas, 'r');
+    //faili sisu kuvamine
+    $faili_sisu = fread($minu_fail, filesize($allikas));
+    echo nl2br($faili_sisu); 
+    //faili sulgemine
+    fclose($minu_fail);
+
+Nüüd peaks sellega korras olema
+
+## Tekstifaili lugemise lühem funktsioon
+Faili kiireks lugemiseks võiks kasutada hoopis **file_get_contents()** funktsiooni
+
+    $allikas = 'loomad.txt';
+    echo nl2br(file_get_contents($allikas));
+
+## Tekstifaili lugemine ridade kaupa
+Kasutades faili lugemiseks funktsiooni **fgets()**, kuvatakse meile ainult esimene rida.
+
+    $allikas = 'loomad.txt';
+    $minu_fail = fopen($allikas, 'r');
+    //loeb esimese rea
+    $faili_sisu = fgets($minu_fail);
+    echo $faili_sisu;
+    fclose($minu_fail);
+
+Selleks, et kuvada selle funktsiooni abil kõik read, kasutame funktsiooni **feof()** ja tsüklit **while**. feof() funktsioon kontrollib, kas oled jõudnud faili lõppu ja kui me kasutame eitust, siis tsükkel kestab seni, kuni “kursor” on jõunud faili lõppu.
+
+    $allikas = 'loomad.txt';
+    $minu_fail = fopen($allikas, 'r');
+    //kõikide ridade kuvamine
+    while(!feof($minu_fail)){
+        $faili_sisu = fgets($minu_fail);
+        echo nl2br($faili_sisu);
+        }
+        
+    fclose($minu_fail);
+
+## Tekstifaili info
+Vaatame mõningaid võimalusi kasutatava tekstifaili info kuvamise kohta.
+
+- **Faili nimi** – nu selle väärtuse saame kenasti muutujast
+- **Faili suurus** – seda me piilusime ka juba ning kuvab faili suuruse baitides
+- **Viimati muudetud** – viimati muutmise all vaatame kolme funktsiooni:
+  - filectime() – kuvab viimati faili sisu ja metaandmete muutmise aja sekundites
+  - filemtime() – kuvab viimati faili sisu muutmise aja sekundites
+  - fileatime() – viimati faili kirjutatud või loetud aeg sekundites
+  
+    $allikas = 'loomad.txt';
+    $suurus = filesize($allikas);
+    $viimati_muudetud = date('d.m.Y G:i' ,filectime($allikas));
+    echo 'Faili nimi: '.$allikas.'<br>';
+    echo 'Faili suurus: '.$suurus.'baiti<br>';
+    echo 'Viimati muudetud: '.$viimati_muudetud.'<br>';
+
+Üks tore funktsioon siinkohal on kasutada **pathinfo()**, mis kuvab faili omadused nagu:
+
+- dirname – kataloog
+- basename – faili nimi koos laiendusega
+- filename – faili nimi
+- extension – faili laiendus massiivina
+    
+    
+    $allikas = 'kataloog/loomad.txt';
+    $faili_info = pathinfo($allikas);
+    echo $faili_info['dirname'].'<br>';
+    echo $faili_info['basename'].'<br>';
+    echo $faili_info['filename'].'<br>';
+    echo $faili_info['extension'].'<br>';
+
+## Tekstifailis saadud andmete töötlemine
+Selleks, et failist saadud andmetega peale kuvamise midagi peale hakata, tuleb need lugeda massiivi. Üks võimalus on selleks kasutada **file()** funktsiooni.
+
+    $allikas = 'numbrid.txt';
+    $minu_fail = file($allikas);
+    print_r($minu_fail);
+    //väljund
+    /*
+        [0] => 12
+        [1] => 13
+        [2] => 3
+        [3] => 54
+        [4] => 6
+        [5] => 
+        [6] => 34
+        [7] => 3
+        [8] => 23
+        [9] => 
+        [10] => 23
+        [11] => 44
+    */
+
+Nagu väljundist vaadata võite, oli mul tekitatud numbrite loend. Kahjuks oli ka mul tühje ridu sisse “unustatud”. Õnneks võimaldab antud funktsioon tühje ridu ignoreerida.
+
+    $allikas = 'numbrid.txt';
+    $minu_fail = file($allikas, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    print_r($minu_fail);
+    //väljund
+    /*
+    (
+        [0] => 12
+        [1] => 13
+        [2] => 3
+        [3] => 54
+        [4] => 6
+        [5] => 34
+        [6] => 3
+        [7] => 23
+        [8] => 23
+        [9] => 44
+    )
+    */
+
