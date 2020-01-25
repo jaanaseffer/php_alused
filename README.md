@@ -414,3 +414,172 @@ Nagu eelpool mainitud, on ajafunktsioone päris palju ja kõike ei jõua läbi v
     
     
     
+# Tekstifunktsioonid
+Oleme siiani usinasti juba teksti kasutanud – seda väljastades, liitnud erinevaid tekstiosi ning teostanud mõningast vormindamist. Selles peatükis sunnime peale oma vormindamist, vaatame kuidas leida tekstist midagi ning vajadusel asendada soovitud sõnad teise tekstiga.
+
+## Teksti vormindamine
+Vaatame nelja funktsiooni, mis muudavad väiketähti suureks ja vastupidi:
+
+- **strtolower()** – muudab teksti väiketähtedeks
+- **strtoupper()** – muudab teksti SUURTÄHTEDEKS
+- **ucfirst()** – muudab teksti kõige esimese märgi suureks
+- **ucwords()** – muudab iga sõna esimese tähe suureks
+
+Kõik need funktsioonid töötavad kenasti, sinu mureks on lisada ainult soovitud tekst.
+
+    $tekst = 'Life Is About Ignoring The Drama.';
+	echo strtolower($tekst);
+	echo '<br>';
+	echo strtoupper($tekst);
+	
+Kuid kui soovin **ucfirst()** abil muuta ainult esitähte suureks, siis see jätab ülejäänud muutmata. Sellepärast on hea mõte, tekst enne väiksemaks muuta ja siis esitäht suureks.
+
+	$tekst = 'Life Is About Ignoring The Drama.';
+	echo ucfirst(strtolower($tekst));
+	
+## Teksti pikkus
+Aegajalt on tarvis teada, mitu märki on sinu tekstis või mitmest lausest sinu tekst koosneb. Seda näiteks kasutajanime ja parooli kontrollimiseks või näiteks tahate piirata sõnumite arvu. Nende soovide täitmiseks on kaks funktsiooni:
+
+- **strlen()** – loeb kokku märkide arvu tekstis, ka tühikud ja kirjavahemärgid
+- **str_word_count()** – loeb kokku sõnade arvu
+
+        $tekst = 'Experience is the teacher of fools';
+        echo strlen($tekst);			//34
+        echo '<br>';
+        echo str_word_count($tekst);	//6
+    
+str_word_count() pakub parameetrite näol veelgi võimalusi, kuid seda vaatame kaks pealkirja allpool.
+
+## Teksti kärpimine
+Teksti kärpimise all pean silmas seda, et tekstis võib olla midagi liiga palju, näiteks ülearused tühikud, tabulaatorid, soovimatu kood või soovid kuvada vähem. Alustame sellest, et muutuja algusesse ja lõppu on sattunud ülearused tühikud ja tabulaatorid. Sellise teksti kuvamisel eemaldatakse kõik automaatselt ja ei olegi nagu probleemi. Probleem tekib, kui see kirjutada näiteks andmebaasi. Aga, et tulemus oleks hetkel kenasti silmaga näha, siis lisan kõik **\<pre>\</pre>** siltide vahele.
+
+    $tekst = ' 	A woman should soften but not weaken a man   ';
+    echo "<pre>$tekst</pre>";
+    echo "<pre>".trim($tekst)."</pre>";
+    echo "<pre>".ltrim($tekst)."</pre>";
+    echo "<pre>".rtrim($tekst)."</pre>"; 
+    
+Niisiis kasutasime **trim()** funktsiooni, mis eemaldas ülearuse tühja nii paremalt kui vasakult. Teised kaks, **ltrim()** ja **rtrim()** eemaldab vasavalt vasakult ja paremalt. Kõik kolm kärpimise funktsiooni lubavad lisada ka sümbolid, mida soovid eemaldada. Funktsioon on tõstutundlik, sümbolid eraldatakse komaga ning tähestiku vahemikk tuleb tähistada kahe punktiga (..). Eemaldame teksti otstest märgid A ja a ning k kuni n.
+
+    $tekst = 'A woman should soften but not weaken a man';
+    echo trim($tekst, "A, a, k..n, w");	//oman should soften but not weake
+    
+Aga kui kasutaja üritab saata teksti, mis sisaldab HTML ja PHP koodi, siis on juhtumeid, kus tahad sellest lahti saada. Sellest aitab lahti saada **strip_tags()** funktsioon.
+
+    $tekst = '<b>Experience</b> <a href="#">is</a> the teacher <br>of fools';
+    echo strip_tags($tekst); 	//Experience is the teacher of fools
+ 
+Sama funktsioon lubab ka määrata, mis märgendid on lubatud. Lubame näiteks <b> ja <br> sildid.
+
+    $tekst = '<b>Experience</b> <a href="#">is</a> the teacher <br>of fools';
+    echo strip_tags($tekst, '<b>, <br>'); 	//<b>Experience</b> is the teacher <br>of fools   
+   
+## Tekst kui massiiv
+PHP käsitleb teksti kui massiivi, kus esimene märk on indeksiga 0 jne.
+
+    $tekst = 'All thinking men are atheists';
+    echo $tekst[0]; 				//A
+    echo '<br>';
+    echo $tekst[4]; 				//t
+    
+Kui soovid tekstist mingit osa kätte saada, siis kasuta funktsiooni substr(), kus esimene arv määrab mitmenast indeksist alustatakse ning teine mitmendast lõpetatakse. Lisades negatiivsed arvud, hakkatakse lugema lõpust algusesse.
+
+    $tekst = 'All thinking men are atheists';
+    echo substr($tekst, 3, 5);		//thin
+    echo '<br>';
+    echo substr($tekst, 4, -13);	//thinking men
+    echo '<br>';
+    echo substr($tekst, -8, 7);		//atheist
+    
+Mõni rida üles, kasutasime sõnade kokkulugemiseks **str_word_count()** funktsiooni. Sellele funktsioonile lisades parameetrina 1, loetakse sõnad kui massiivi elemendid.
+
+    $tekst = 'All thinking men are atheists';
+    print_r(str_word_count($tekst, 1));		//Array ( [0] => All [1] => thinking [2] => men [3] => are [4] => atheists )
+    
+Sellest massiivist siis mõne sõna väljakutsumiseks paiguta see esmalt muutujasse ja siis määra indeks.
+
+    $tekst = 'All thinking men are atheists';
+    $sona = str_word_count($tekst, 1);
+    echo $sona[2];							//men
+    
+Andes **str_word_count()** funktsioonile parameetri 2, määratakse sõna indeks vastava sümboli indeksiga kogu massiivis.
+
+    $tekst = 'All thinking men are atheists';
+    print_r(str_word_count($tekst, 2));		
+    //Array ( [0] => All [4] => thinking [13] => men [17] => are [21] => atheists ) 
+    
+## Tekstist otsimine
+Meie tekstifunktsioonide peatükk on jõudmas lõpule. Viimase osana vaatame kuidas leida tekstist teatud sõnu ning pärast seda kuidas soovitud asendada. Otsimiseks **strpos()** funktsiooni, mis lubab meil lisada kolm parameetrit:
+
+ - tekst, kust otsitakse
+- tekst, mida otsitakse
+- nihe ehk mitmendast märgist otsimist alustatakse.
+
+        $tekst = 'Happiness in intelligent people is the rarest thing I know.';
+        $otsitav = 'in';
+        $leia_tekstist = strpos($tekst, $otsitav, 0);	//4
+        echo $leia_tekstist;
+        
+Meil on siis tekst, kust otsime näiteks sõna ‘in’ ja alustame algusest. Tulemuseks saame indeksi väärtuse ‘4’, kuna ‘Happiness’ sõnas on see täitsa olemas. Kui nihet muuta, siis leiab see kenasti järgmise asukoha.
+
+    ...
+    $leia_tekstist = strpos($tekst, $otsitav, 6);	//10
+    ...
+    
+Järgmine samm selle koodi puhul võiks olla see, et see leiab tekstist kõik otsitavad. Arvatavasti võiks kasutada selleks mingisugust tsüklit, mis väljastab soovitud indeksi ja muudab nihet. Nihke arvutamisel tuleb siis arvesse võtta juba leitud indeksi väärtust ja otsitava sõna pikkus.
+
+    $tekst = 'Happiness in intelligent people is the rarest thing I know.';
+    $otsitav = 'in';
+    $nihe = 0;
+    while($leia_tekstist = strpos($tekst, $otsitav, $nihe)){	//4 10 13 48
+        echo $leia_tekstist.'<br>';
+        $nihe = $leia_tekstist+strlen($otsitav);
+    }
+    
+Nagu näha, leiab see kenasti kõik sõna asukohad.
+
+## Teksti asendamine
+Teksti asendamiseks vaatame kahte funktsiooni. Esimesena kasutame **substr_replace()** funktsiooni, mis vajab nelja parameetrit:
+
+- tekst, kust otsida
+- asendatav tekst
+- arv, mis tähistab indeksit, kuhu asendatav tekst lisatakse
+- arv, mis tähistab asendatava sõna pikkuse
+
+Loome lause, kus soovime asendada sõna ‘papa’ sõnaga ’emme’.
+
+    $tekst = 'Pai papa, pane paadile punased purjed peale';
+    $asendus = 'emme';
+    $otsitav_algus = 4;
+    $otsitav_pikkus = 4;
+    echo substr_replace($tekst, $asendus, $otsitav_algus, $otsitav_pikkus);
+    
+Nagu näha määrasime koha, kuhu uus sõna läheb (4) ning mitu tähte nö. ära kustutatakse (4). Samas saab need arvud ka ju dünaamiliseks teha.
+
+    $tekst = 'Pai papa, pane paadile punased purjed peale';
+    $asendus = 'emme';
+    $otsitav = 'papa';
+    $nihe = 0;
+    $asenduse_algus = strpos($tekst, $otsitav, $nihe);
+    $asenduse_markide_arv = strlen($otsitav);
+    echo substr_replace($tekst, $asendus, $asenduse_algus, $asenduse_markide_arv);
+    
+Loomulikult võid kasutada eelpool õpitud tsüklit, kui asendatavaid sõnu on tekstis rohkem. Kindla sõna asendamiseks kasutame **str_replace()**, mis tahab saada vähemalt kolme parameetrit:
+
+- otsitav tekst
+- asendus tekst
+- tekst, kust otsida
+
+
+    $tekst = 'Musta lehma saba musta lehma taga, valge lehma saba valge lehma taga';
+    $otsi = 'lehm';
+    $asenda = 'koer';
+    echo str_replace($otsi, $asenda, $tekst); 
+
+Selle funktsiooni juures on tore see, et otsitavad ja asendatavad võivad olla massiivis.
+
+    $tekst = 'Musta lehma saba musta lehma taga, valge lehma saba valge lehma taga';
+    $otsi = array('lehm', 'saba', 'taga');
+    $asenda = array('koer', 'sarv', 'ees');
+    echo str_replace($otsi, $asenda, $tekst);
+    
