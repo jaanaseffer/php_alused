@@ -93,3 +93,16 @@ if($juubel = 0) {
 echo '<hr>';
 
 //Koosta kood, mis tervitab sind vastavalt ajale. N: 8:00+ “Tere hommikust!”, 13:00+ “Tere päevast!” ja 17:00+ “Tere õhtust!”
+echo date("h:i a");
+$morningTime = "08:00:00";
+$dayTime = "13:00:00";
+$eveningTime = "17:00:00";
+$currentTime = date("h:i a");
+if($currentTime > $morningTime and $currentTime < $dayTime) {
+    echo "Tere hommikust!<br>";
+} else if ($currentTime > $dayTime and $currentTime < $eveningTime) {
+    echo "Tere päevast!<br>";
+} else if ($currentTime > $eveningTime) {
+    echo "Tere õhtust!<br>";
+}
+echo '<hr>';
