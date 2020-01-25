@@ -583,3 +583,136 @@ Selle funktsiooni juures on tore see, et otsitavad ja asendatavad võivad olla m
     $asenda = array('koer', 'sarv', 'ees');
     echo str_replace($otsi, $asenda, $tekst);
     
+
+# Koodi taaskasutamine
+Vaatame kuidas on mõistlik varem kirjutatud koodi taaskasutada, et muuta koodi lühemaks ja võita ajas. Selles peatükis peatume **require()** ja **include()** funktsioonide juures. Kui saame teada, mida need teevad, siis loome nende abil nö. dünaamilise lingi.
+
+## require vs include
+Mõlemad funktsioonid teevad kasutaja jaoks ühte ja sama. Nende erinevus tuleb välja alles vea tekkimisel Require() annab fatal error‘i ja kood üritab edasi töötada aga include() lõpetab programmi edasise töö. Aga mida nad siis teevad? Nimetatud funktsioonid võimaldavad laadida avatud dokumenti teise faili sisu. See võimaldab pikka koodi jagada erinevate failide vahel. Näiteks on meil veebileht, kus dokumendi päis ja jalus on üks ja sama.
+
+    <!doctype html>
+    <html>
+    <head>
+    <title>Koodi taaskasutamine</title>
+    <style>
+    * {
+        padding: 0;
+        margin: 0;
+        font-family: Verdana, Geneva, sans-serif;
+    }
+    #pais {
+        background-color: #6C9;
+        line-height: 100px;
+    }
+    #jalus {
+        background-color: #F93;
+        line-height: 30px;
+    }
+    </style>
+    </head>
+    <body>
+    <header id="pais">
+      <h1>Lorem Ipsum web</h1>
+    </header>
+    <div id="sisu">
+      <h2>Lorem ipsum</h2>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris lacinia feugiat mi, ac blandit purus hendrerit vel.</p>
+    </div>
+      <footer id="jalus">
+        <p>No kopirait</p>
+      </footer>
+    </body>
+    </html>
+    
+Ja kui meil lehti oleks rohkem ning kui soovid muudatusi teha, siis peaksid kõik lehed läbi käima (koodis olev CSS võiks ka olla omaette failis). Seega võtan hoopis kogu koodi, mis on sisust üleval  ja all ning kopeerin eraldi faili. Dokumenti toomiseks kasutan siis include() funktsiooni.
+
+    <?php include('13_includerequire_pais.php'); ?>
+    <div id="sisu">
+      <h2>Lorem ipsum</h2>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris lacinia feugiat mi, ac blandit purus hendrerit vel.</p>
+     </div>
+     
+    <?php include('13_includerequire_jalus.php'); ?>
+    
+Nüüd dokumendi avamisel laetakse teised kaks teist faili kenasti omale kohale ja tulemus on sama, mis enne. Paremaks muutus nüüd see, et saame keskenduda just sisule ja kui vaja teha muudatusi päises, siis saan seda teha ühest failist. Ühendatava dokumendi faililõpp pole oluline ja seepärast võid nimetamisel kasutada näiteks **pais.inc** või **pais.inc.php** nimesid. Lihtsalt *.inc kasutamisel võib olla oht, et kasutaja trükkides sisse antud faili näeb su koodi.
+
+## require_once ja include_once
+Kasutades funktsioone **require_once** või **include_once**, uurib kood, kas soovitud fail on juba eelnevalt ühendatud. Kui on, siis seda rohkem ei tehta.
+
+    <?php 
+        include('13_includerequire_pais.php'); 
+        include_once('13_includerequire_pais.php'); 	//ei käivitu, kuna on juba olemas
+    ?>
+    
+## Dünaamilised lingid
+Loome lingid, mille põhjal kood valib vastava dokumendi sisu. Ja kasutame kenasti **inlude()** funktsiooni abi. Meil on hetkel situatsioon, kus meil on neli php dokumenti ja soovime, et teiste dokumentide sisu kuvatakse index.php dokumendis.
+
+Avame index.php ja loome lingid, mille kaudu saab kasutaja öelda, millise faili sisu vaja on (jätsin harjutusest päise ja jaluse välja).
+
+    <menu>
+        <a href="index.php">Avaleht</a> |
+        <a href="index.php?leht=portfoolio">Portfoolio</a> |
+        <a href="index.php?leht=kaart">Kaart</a> |
+        <a href=index.php?leht=kontakt">Kontakt</a>
+    </menu>
+    
+    <h2>Avaleht</h2>
+    <p>Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum</p>
+    
+See kood lisab aadressiribale muutuja ‘leht’ koos väärtustega.
+
+Info kättesaamiseks aadressiribalt kasutasime GET meetodit. Nüüd kui kasutaja on vajutanud lingile kontakt, siis saame selle ühildada meie failinimega. Et kasutaja ei saaks veateadet, kuni ta pole lingile vajutanud, siis lisame ette kontrolli.
+
+    <menu>
+        <a href="index.php">Avaleht</a> |
+        <a href="index.php?leht=portfoolio">Portfoolio</a> |
+        <a href="index.php?leht=kaart">Kaart</a> |
+        <a href=index.php?leht=kontakt">Kontakt</a>
+    </menu>
+    
+    <?php
+    if(!empty(&_GET['leht'])){
+        include(&_GET['leht'].'php');
+    } else {
+    
+    ?>
+    <h2>Avaleht</h2>
+    <p>Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum</p>
+    <?php
+    }
+    ?>
+    
+Antud koodis on PHP kood vahepeal katkestatud, et saaks kirjutada tavalist HTML koodi. Nüüd on probleem, et failide külgepookimine ilma kontrollita, ei ole kõige turvalisem ja kui kasutaja muudab aadressiribal muutuja väärtust, siis saame veateate. Kontrollida võiks kas küsitud fail eksisteerib **(is_file())**. Ja siis keelaks igasugused html märgendid.
+
+    <?php
+    if(!empty($_GET['leht'])){
+        $leht = htmlspecialchars($_GET['leht']);
+        if(is_file($leht.'.php')){
+            include($leht.'.php');
+        } else {
+            echo 'Valitud lehte ei eksisteeri!';
+        }
+    } else {
+    ?>
+    
+Võibolla tasuks luua lubatud lehtede massiivi ning kood kontrollib, kas selline leht on nimekirjas või mitte.
+
+    <?php
+    if(!empty($_GET['leht'])){
+        $leht = htmlspecialchars($_GET['leht']);
+        $lubatud = array('portfoolio','kaart','kontakt');
+        $kontroll = in_array($leht, $lubatud);
+        if($kontroll==true){
+            include($leht.'.php');
+        } else {
+            echo 'Valitud lehte ei eksisteeri!';
+        }
+    } else {
+    ?>
+    
+Täiendan seda peatükki veelgi, sest tekkis idee kuidas seda saaks veel kontrollida. Nimelt võiks ju tekitada lehed leht1.php, leht2.php jne. Miks? Sest me saaks läbi GET muutuja küsida numbrit ja seda kontrollida **is_numeric()** funktsiooniga.
+
+    $leht = $_GET['leht'];
+    if(is_numeric($leht)){
+       include('leht'.$leht.'.php');
+    }
