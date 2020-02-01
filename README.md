@@ -958,3 +958,95 @@ Nagu väljundist vaadata võite, oli mul tekitatud numbrite loend. Kahjuks oli k
     )
     */
 
+# Töö CSV failidega
+CSV (Comma Separated Values) on failivorming, kus andmed on üksteisest eraldatud komadega või hoopis semikoolonitega. Iga rida käsitletakse kirjena ning semikooloniga eraldatakse andmeväljad teineteisest. Tegemist on populaarse failiga mille töötlemisega saavad hakkama nii Notepad, Excel, MySQL jne. Antud formaati kasutatakse näiteks ühest programmist teise andmete eksportimiseks.
+
+## CSV faili sisu kuvamine
+CSV faili sisu lahkamiseks kasutame **fgetscv()** funktsiooni, nus vajab kolme parameetrit:
+
+- faili ennast
+- faili suurust (tähemärkide arvu)
+- eraldajat
+
+Antud funktsiooni kasutamisel loetakse sisse ainult esimene rida ja see ka massiivina.
+
+    $allikas = 'pallivise.csv';
+    $minu_csv = fopen($allikas, 'r') or die('Ei leia faili!');
+    $rida = fgetcsv($minu_csv, filesize($allikas),';');
+    var_dump($rida);
+    fclose($minu_csv);
+
+Väljund:
+
+    array (size=3)
+      0 => string 'Madis' (length=5)
+      1 => string 'M' (length=1)
+      2 => string '19' (length=2)
+  
+Selleks, et saaks kätte kõik read, tuleb jällegi kasutada mõnda tsüklit, näiteks **while()**, mis vastutab ridade eest. Kuna igas reas on veel kolm elementi, siis peame ühe tsükli veel looma – **for()**. Ning täiendame koodi näiteks järjekorranumbriga.
+
+    $allikas = 'pallivise.csv';
+    $minu_csv = fopen($allikas, 'r') or die('Ei leia faili!');
+    $jrk = 1;
+    while(!feof($minu_csv)){
+        $rida = fgetcsv($minu_csv, filesize($allikas),';');
+        $arv = count($rida); //rea väljade arv
+        echo $jrk.'. '; //järjekorra number
+        $jrk++;
+        for($i = 0; $i<$arv; $i++){
+            echo $rida[$i].' ';	
+        }
+        echo '<br>';
+        
+    }
+    fclose($minu_csv);  
+
+Väljund:
+
+1. Madis M 19 
+2. Anu N 16 
+3. Elen N 22 
+4. Nele N 25 
+5. Jenni N 25 
+6. Eero M 26 
+7. Taavi M 19 
+8. Sirle N 29  
+
+## Faili sisu tükeldamine
+
+Funktsioon **explode()**, on olemuselt sarnane just eelmise vaadatud funktsiooniga. Nimelt võimaldab see tükeldada etteantud teksti, mis paigutatakse massiivi. Tükelduskoha saab kasutaja ise valida, olgu selleks koma, @ või mõni teine korduv sümbol. Näiteks on meil fail **emailid.txt**, kust oleks vaja kätte saada kasutajanimed.
+
+    jyri(at)hot.ee
+    mari(at)mail.ee
+    juhan(at)gmail.com
+    kr66t(at)hotmail.com
+    gusta(at)yahoo.com
+
+Selleks avame soovitud faili ja tükeldame selle kõigepealt ära realõpust. Realõpu tähiseks on \n, kus iga rida loetakse massiivi. Nüüd oleks vaja iga massiivi element omakorda tükeldada (at) märgi kohalt ning prindime välja nimed.
+
+    $allikas = 'emailid.txt';
+    $minu_fail = fopen($allikas, 'r');
+    $faili_sisu = file_get_contents($allikas);
+    $massiiv = explode("\n", $faili_sisu); //tükeldab realõpust
+    $suurus = count($massiiv);
+    for ($i = 0; $i < $suurus; $i++) {
+        $rida = $massiiv[$i];
+        $nimi = explode('(at)', $rida); //tükeldab (at) märgi kohast
+        echo $nimi[0].'<br>';   
+    }
+    fclose($minu_fail);
+    
+Tulemuseks kasutaja nimed:
+
+    jyri
+    mari
+    juhan
+    kr66t
+    gusta
+
+## Faili sisu ühendamine
+Explode funktsioonile vastupidiselt töötab **implode()**. See võtab massiivist võetud elemendid ja muudab tekstiks. Kusjuures kasutaja saab valida sümboli, mis lisatakse sõnade vahele. Näiteks võtame nimede massiivist kõik nimed ja eraldame need komaga.
+
+    $nimed = array('jyri', 'mari', 'juhan', 'kr66t', 'gusta');
+    $emailid = implode(", ", $nimed);
+    echo $emailid;
